@@ -114,7 +114,10 @@ public class ChatServerA
                     }
                 }else
                 {
-                    tellEveryone(user + ": " + message);
+                    if(message.matches("^[\\w!@#$%^&*()\\-+=`~/?.,<>\\[\\]{}|\\\\\\x20:;]{1,4096}$"))
+                        tellEveryone(user + ": " + message);
+                    else
+                        System.out.println("connection " + sock + " attempted to send a message with illegal characters");
                 }               
             }
          } catch (Exception ex) 
