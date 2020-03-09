@@ -60,10 +60,11 @@ public class ChatServerA
                     
                     if(loginDat[0].equals("REG"))
                     {
-                        Statement register = dbCon.createStatement();  
+                        String loginCheck = "SELECT NAME FROM USERS WHERE NAME = ?";
+                        PreparedStatement register = dbCon.prepareStatement(loginCheck);
+                        register.setString(1, loginDat[1].toLowerCase());
                         
-                        String loginCheck = "SELECT PASS FROM USERS WHERE NAME == '" + loginDat[1].toLowerCase() + "'";
-                        ResultSet rs = register.executeQuery(loginCheck);
+                        ResultSet rs = register.executeQuery();
                         
                         if(rs.next())
                         {
@@ -75,18 +76,22 @@ public class ChatServerA
                             continue;
                         }
                         
-                        String regString = "INSERT INTO USERS (NAME,PASS) VALUES ('" + loginDat[1].toLowerCase() + "', '" + loginDat[2] + "');";
-                        System.out.println(regString);
-                        register.execute(regString);
+                        //String regString = "INSERT INTO USERS (NAME,PASS) VALUES ('" + loginDat[1].toLowerCase() + "', '" + loginDat[2] + "');";
+                        String regString = "INSERT INTO USERS (NAME,PASS) VALUES (?, ?);";
+                        register = dbCon.prepareStatement(regString);
+                        register.setString(1, loginDat[1].toLowerCase());
+                        register.setString(2, loginDat[2]);
+                        register.execute();
                         writer.println("account registered");
                         writer.flush();
                         register.close();
                         rs.close();                   
                     }else if(loginDat[0].equals("LOG"))
-                    {                        
-                        Statement login = dbCon.createStatement();
-                        String loginCheck = "SELECT PASS FROM USERS WHERE NAME == '" + loginDat[1].toLowerCase() + "'";
-                        ResultSet rs = login.executeQuery(loginCheck);
+                    {        
+                        String loginCheck = "SELECT PASS FROM USERS WHERE NAME = ?";
+                        PreparedStatement login = dbCon.prepareStatement(loginCheck);
+                        login.setString(1, loginDat[1].toLowerCase());
+                        ResultSet rs = login.executeQuery();
                         
                         if(rs.next())
                         {
@@ -145,8 +150,6 @@ public class ChatServerA
       } 
       new ChatServerA().go("accounts.db");
    }
-   
-   
    
    public void go(String dbName) throws SQLException 
    {
